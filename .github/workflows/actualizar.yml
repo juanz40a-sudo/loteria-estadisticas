@@ -1,0 +1,42 @@
+name: Actualizar resultados
+
+on:
+  schedule:
+    # Cada noche a las 22:45 UTC (23:45 en España en invierno, 00:45 en verano)
+    - cron: '45 22 * * *'
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+concurrency:
+  group: actualizar-resultados
+  cancel-in-progress: false
+
+jobs:
+  actualizar:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+
+      - name: Añadir sorteos nuevos
+        run: python3 scripts/actualizar.py
+
+      - name: Regenerar la página
+        run: python3 build_data.py
+
+      - name: Guardar cambios
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add -A
+          if git diff --cached --quiet; then
+            echo "Sin sorteos nuevos."
+          else
+            git commit -m "Actualizar resultados automáticamente"
+            git push
+          fi
