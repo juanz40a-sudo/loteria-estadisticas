@@ -161,14 +161,18 @@ nav.tabs::-webkit-scrollbar{display:none}
 .dec-aviso{margin:14px 0 0;font:600 10px system-ui;letter-spacing:.14em;text-transform:uppercase;color:#7b6a3e}
 @media (max-width:700px){
   .decimo{padding:6px}
-  .dec{grid-template-columns:60px minmax(0,1fr) 54px;gap:6px;padding:8px}
+  .dec{grid-template-columns:60px minmax(0,1fr);gap:6px;padding:8px}
+  .dec-foto{grid-row:1 / span 2}
+  .dec-centro{grid-column:2;grid-row:1}
+  .dec-lat{grid-column:2;grid-row:2;flex-direction:row;justify-content:space-between;gap:5px}
+  .dec-lat .caja-l{flex:1 1 0;min-width:0}
   .dec::before{inset:4px}
   .dec-foto{border-radius:3px;min-height:0;align-self:center}
   .dec-foto img{position:static;width:100%;height:auto;object-fit:initial}
   .dec-cab{font-size:7px;letter-spacing:.06em;padding-bottom:5px;gap:4px}
   .dec-top{font-size:6px;letter-spacing:.06em}
-  .dec-aros{gap:3px;margin:4px 0 0;flex-wrap:nowrap}
-  .aro{width:24px;height:24px;border-width:3px;font-size:11px;box-shadow:inset 0 0 0 1px #f4dc8e}
+  .dec-aros{gap:5px;margin:4px 0 0;flex-wrap:nowrap}
+  .aro{width:34px;height:34px;border-width:4px;font-size:17px;box-shadow:inset 0 0 0 1px #f4dc8e}
   .dec-titulo{margin-top:6px;font-size:13px}
   .dec-fecha{margin-top:4px;font-size:9px}
   .dec-barras{height:16px;margin-top:6px;width:80%}
