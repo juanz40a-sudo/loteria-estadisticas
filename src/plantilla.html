@@ -239,6 +239,7 @@ footer p{margin:0 0 8px}
 .etq{font:700 10px/1 system-ui,-apple-system,Arial,sans-serif;letter-spacing:.12em;text-transform:uppercase;color:var(--tinta2)}
 .esfera.xs{width:34px;height:34px;font-size:14px}
 .grupo{display:inline-flex;gap:6px}
+.extras.ult{justify-content:flex-start;margin-top:12px;padding-top:12px}
 
 /* botones principales */
 .btn{
@@ -456,10 +457,11 @@ function vistaProbabilidades(est, combo, maxPct){
 }
 function ultimoHTML(cfg, u){
   if (!u) return '<span class="muted">Sin datos</span>';
-  let h = esferas(ordenar(u.n).map(n=>pad(n,2)), 's');
-  if (cfg.extra==='complementario') h += esferas([pad(u.c,2)],'s comp') + esferas([u.r],'s');
-  if (cfg.extra==='estrellas') h += esferas(u.e.map(e=>pad(e,2)),'s estrella');
-  if (cfg.extra==='clave') h += esferas([u.clave],'s comp');
+  const ext = (etq, html) => `<div class="ext"><span class="etq">${etq}</span>${html}</div>`;
+  let h = `<div class="linea-esferas">${esferas(ordenar(u.n).map(n=>pad(n,2)), 's')}</div>`;
+  if (cfg.extra==='complementario') h += `<div class="extras ult">${ext('Complementario', esferas([pad(u.c,2)],'xs comp'))}${ext('Reintegro', esferas([u.r],'xs'))}</div>`;
+  if (cfg.extra==='estrellas') h += `<div class="extras ult">${ext('Estrellas', `<span class="grupo">${esferas(u.e.map(e=>pad(e,2)),'xs estrella')}</span>`)}</div>`;
+  if (cfg.extra==='clave') h += `<div class="extras ult">${ext('Clave', esferas([u.clave],'xs comp'))}</div>`;
   return h;
 }
 
@@ -484,7 +486,7 @@ function construirSorteo(cfg){
       </div>
       <div>
         <p class="kicker">Último resultado · ${fechaUlt}</p>
-        <div class="linea-esferas">${ultimoHTML(cfg, u)}</div>
+        ${ultimoHTML(cfg, u)}
       </div>
     </section>
 
