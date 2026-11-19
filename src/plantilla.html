@@ -499,49 +499,8 @@ function construirSorteo(cfg){
       <p class="pie">Al azar: todos los números tienen la misma opción. Por frecuencia: se eligen más los que han salido más veces. Ninguna de las dos aumenta tus posibilidades.</p>
     </section>
 
-    <section class="card">
-      <div class="cabecera-card"><h3>Frecuencia por número</h3><span class="muted">Barras: veces que ha salido cada número</span></div>
-      <div class="grafico">${graficoSVG(est.lista.map(r=>r.veces), est.lista.map(r=>pad(r.valor,2)), indicesTop)}</div>
-      <p class="pie">En rojo, los cinco números que más han salido.</p>
-    </section>
-
-    <div class="grid2">
-      <div class="card">
-        <h3>Los que más han salido</h3>
-        <table><thead><tr><th>Nº</th><th>Veces</th><th>% sorteos</th></tr></thead>
-        <tbody>${top.slice(0,10).map(r=>`<tr><td class="num">${pad(r.valor,2)}</td><td>${nf(r.veces)}</td><td>${pct(r.pct)}</td></tr>`).join('')}</tbody></table>
-      </div>
-      <div class="card">
-        <h3>Los que más llevan sin salir</h3>
-        <table><thead><tr><th>Nº</th><th>Sorteos sin salir</th></tr></thead>
-        <tbody>${over.slice(0,10).map(r=>`<tr><td class="num">${pad(r.valor,2)}</td><td>${nf(r.atrasado)}</td></tr>`).join('')}</tbody></table>
-      </div>
-    </div>
-
-    <div class="grid2">
-      <div class="card">
-        <h3>Últimos 10 sorteos</h3>
-        <table><thead><tr><th>Fecha</th><th>Combinación</th></tr></thead>
-        <tbody>${ultimos10.map(f=>`<tr><td>${fechaES(f.f)}</td><td><div class="bolitas">${ordenar(f.n).map(n=>`<span>${pad(n,2)}</span>`).join('')}${cfg.extra==='complementario'?`<span class="c">${pad(f.c,2)}</span>`:''}</div></td></tr>`).join('')}</tbody></table>
-      </div>
-      <div class="card">
-        <h3>Todos los números</h3>
-        <input type="search" placeholder="Buscar número, por ejemplo 17" data-buscar>
-        <div class="scroll"><table><thead><tr><th>Nº</th><th>Veces</th><th>% sorteos</th><th>Sin salir</th></tr></thead><tbody data-tabla></tbody></table></div>
-      </div>
-    </div>
     <p class="disc">El % indica en cuántos de los ${nf(T)} sorteos ha salido cada número. Con tanto histórico, las diferencias entre números son pequeñas y se deben sobre todo al azar.</p>`;
   document.getElementById('paneles').appendChild(sec);
-
-  // tabla completa con buscador
-  const tbody = sec.querySelector('[data-tabla]');
-  const pintarTabla = (f='') => {
-    const q = f.trim();
-    tbody.innerHTML = est.lista.filter(r => !q || pad(r.valor,2).includes(q))
-      .map(r=>`<tr><td class="num">${pad(r.valor,2)}</td><td>${nf(r.veces)}</td><td><div style="display:flex;gap:10px;align-items:center">${pct(r.pct)}<div class="barra-mini" style="flex:1"><span style="width:${(r.pct/maxPct*100).toFixed(1)}%"></span></div></div></td><td>${nf(r.atrasado)}</td></tr>`).join('');
-  };
-  pintarTabla();
-  sec.querySelector('[data-buscar]').addEventListener('input', e => pintarTabla(e.target.value));
 
   // generador con tres vistas
   let combo = null, vista = 'bolas';
@@ -623,40 +582,8 @@ function construirNavidad(){
       <p class="pie">Cada cifra se elige por separado. Por frecuencia usa cuánto ha salido cada dígito en esa posición a lo largo de la historia.</p>
     </section>
 
-    <section class="card">
-      <div class="cabecera-card"><h3>Frecuencia de cada cifra</h3><span class="muted">Veces que aparece cada dígito en el número</span></div>
-      <div class="grafico">${graficoSVG(totalDig, [0,1,2,3,4,5,6,7,8,9].map(String), [totalDig.indexOf(Math.max(...totalDig))])}</div>
-    </section>
-
-    <div class="grid2">
-      <div class="card">
-        <h3>Números que han sido Gordo más de una vez</h3>
-        ${repetidos.length ? `<table><thead><tr><th>Nº</th><th>Veces</th></tr></thead><tbody>${repetidos.map(([n,v])=>`<tr><td class="num">${n}</td><td>${v}</td></tr>`).join('')}</tbody></table>` : '<p class="muted">Ningún número se ha repetido como Gordo.</p>'}
-      </div>
-      <div class="card">
-        <h3>Últimos 10 Gordos</h3>
-        <table><thead><tr><th>Año</th><th>Número</th></tr></thead>
-        <tbody>${ultimas10.map(d=>`<tr><td>${d.a}</td><td class="num">${pad(d.n,5)}</td></tr>`).join('')}</tbody></table>
-      </div>
-    </div>
-
-    <div class="card" style="margin-top:16px">
-      <h3>Todos los Gordos</h3>
-      <input type="search" placeholder="Buscar año o número" data-buscar>
-      <div class="scroll"><table><thead><tr><th>Año</th><th>Número</th></tr></thead><tbody data-tabla></tbody></table></div>
-    </div>
     <p class="disc">Solo hay ${nf(T)} sorteos. Con tan pocos datos, las diferencias entre cifras no son significativas. Fuentes: laguinda.app, elgordo.net y The Objective. El año 1969 no está verificado del todo.</p>`;
   document.getElementById('paneles').appendChild(sec);
-
-  // tabla con buscador
-  const tbody = sec.querySelector('[data-tabla]');
-  const pintarTabla = (f='') => {
-    const q = f.trim();
-    tbody.innerHTML = datos.filter(d => !q || String(d.a).includes(q) || pad(d.n,5).includes(q))
-      .map(d=>`<tr><td>${d.a}</td><td class="num">${pad(d.n,5)}</td></tr>`).join('');
-  };
-  pintarTabla();
-  sec.querySelector('[data-buscar]').addEventListener('input', e => pintarTabla(e.target.value));
 
   // generador con tres vistas
   let digitos = null, vista = 'decimo', numero = '', serieNum = '';
