@@ -161,13 +161,14 @@ nav.tabs::-webkit-scrollbar{display:none}
 .dec-aviso{margin:14px 0 0;font:600 10px system-ui;letter-spacing:.14em;text-transform:uppercase;color:#7b6a3e}
 @media (max-width:700px){
   .decimo{padding:6px}
-  .dec{grid-template-columns:minmax(0,.5fr) minmax(0,2.3fr) minmax(0,.62fr);gap:6px;padding:8px}
+  .dec{grid-template-columns:60px minmax(0,1fr) 54px;gap:6px;padding:8px}
   .dec::before{inset:4px}
-  .dec-foto{border-radius:3px;min-height:150px}
+  .dec-foto{border-radius:3px;min-height:0;align-self:center}
+  .dec-foto img{position:static;width:100%;height:auto;object-fit:initial}
   .dec-cab{font-size:7px;letter-spacing:.06em;padding-bottom:5px;gap:4px}
   .dec-top{font-size:6px;letter-spacing:.06em}
-  .dec-aros{gap:4px;margin:4px 0 0;flex-wrap:nowrap}
-  .aro{width:30px;height:30px;border-width:3px;font-size:14px;box-shadow:inset 0 0 0 1px #f4dc8e}
+  .dec-aros{gap:3px;margin:4px 0 0;flex-wrap:nowrap}
+  .aro{width:24px;height:24px;border-width:3px;font-size:11px;box-shadow:inset 0 0 0 1px #f4dc8e}
   .dec-titulo{margin-top:6px;font-size:13px}
   .dec-fecha{margin-top:4px;font-size:9px}
   .dec-barras{height:16px;margin-top:6px;width:80%}
