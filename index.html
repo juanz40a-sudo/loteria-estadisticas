@@ -161,28 +161,19 @@ nav.tabs::-webkit-scrollbar{display:none}
 .dec-aviso{margin:14px 0 0;font:600 10px system-ui;letter-spacing:.14em;text-transform:uppercase;color:#7b6a3e}
 @media (max-width:700px){
   .decimo{padding:6px}
-  .dec{
-    grid-template-columns:112px minmax(0,1fr);gap:6px 8px;padding:10px 10px 8px;
-    grid-template-rows:auto auto auto auto auto auto auto;
-  }
+  .dec{grid-template-columns:150px minmax(0,1fr);gap:8px 10px;padding:12px 12px 10px}
   .dec::before{inset:4px}
   .dec-centro{display:contents}
-  .dec-top{grid-column:1 / -1;grid-row:1;font-size:7px;letter-spacing:.08em}
-  .dec-aros{grid-column:1 / -1;grid-row:2;display:flex;justify-content:center;flex-wrap:nowrap;gap:6px;margin:4px 0 2px}
-  .aro{width:42px;height:42px;border-width:4px;font-size:22px;box-shadow:inset 0 0 0 1px #f4dc8e}
-  .dec-foto{grid-column:1;grid-row:3 / span 4;border-radius:4px;min-height:0;align-self:start}
+  .dec-top{grid-column:1 / -1;grid-row:1;font-size:8px;letter-spacing:.08em}
+  .dec-aros{grid-column:1 / -1;grid-row:2;display:flex;justify-content:center;flex-wrap:nowrap;gap:7px;margin:6px 0 4px}
+  .aro{width:48px;height:48px;border-width:5px;font-size:25px;box-shadow:inset 0 0 0 1px #f4dc8e}
+  .dec-foto{grid-column:1;grid-row:3 / span 2;border-radius:4px;min-height:0;align-self:start}
   .dec-foto img{position:static;width:100%;height:auto;object-fit:initial}
-  .dec-titulo{grid-column:2;grid-row:3;align-self:end;margin:0;font-size:15px;line-height:1.05}
-  .dec-fecha{grid-column:2;grid-row:4;margin:4px 0 0;font-size:10px;align-self:start}
-  .dec-barras{grid-column:2;grid-row:5;width:100%;height:20px;margin:6px 0 0}
-  .dec-codigo{grid-column:2;grid-row:6;margin:3px 0 0;font-size:7px;letter-spacing:.04em;align-self:start}
-  .dec-ornato{display:none}
-  .dec-lat{grid-column:1 / -1;grid-row:7;display:flex;flex-direction:row;justify-content:space-between;gap:5px;margin-top:4px}
-  .dec-lat .caja-l{flex:1 1 0;min-width:0;padding:2px 2px;font-size:6px;letter-spacing:.04em;border-width:1px;border-radius:5px}
-  .dec-lat .caja-l b{font-size:10px;margin-top:1px}
-  .dec-lat .caja-l.precio b{font-size:14px}
-  .dec-lat .caja-l.precio em{font-size:6px;letter-spacing:.08em}
+  .dec-titulo{grid-column:2;grid-row:3;align-self:end;margin:0;font-size:19px;line-height:1.05}
+  .dec-fecha{grid-column:2;grid-row:4;align-self:start;margin:6px 0 0;font-size:14px;line-height:1.25}
+  .dec-barras,.dec-codigo,.dec-ornato,.dec-lat{display:none}
   .dec-aviso{font-size:7px;margin-top:6px}
+}
 }
 }
 }
