@@ -1,0 +1,714 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>JAZR · Estadísticas de sorteos</title>
+<meta name="description" content="Histórico de sorteos: cuántas veces ha salido cada número, cuánto tiempo lleva sin salir y simulador de boletos.">
+<meta name="theme-color" content="#9b1c23">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-title" content="JAZR">
+<link rel="manifest" href="manifest.json">
+<link rel="icon" type="image/png" sizes="192x192" href="icon-192.png">
+<link rel="apple-touch-icon" sizes="180x180" href="icon-180.png">
+<style>
+:root{
+  --papel:#f7f2e8; --papel2:#fffdf7; --tinta:#3a2b22; --tinta2:#7a6d5e; --linea:#e6dccb;
+  --acento:#9b1c23; --acento2:#c8323a; --oro:#b8912f; --barra:#d8ccb4;
+  --radio:16px; color-scheme: light;
+}
+@media (prefers-color-scheme: dark){
+  :root:not([data-theme="light"]){
+    --papel:#17130f; --papel2:#221c16; --tinta:#f1e9dc; --tinta2:#b3a590; --linea:#3a3026;
+    --acento:#d6434b; --acento2:#e25a61; --oro:#d9b25a; --barra:#4a3f33; color-scheme: dark;
+  }
+}
+:root[data-theme="dark"]{
+  --papel:#17130f; --papel2:#221c16; --tinta:#f1e9dc; --tinta2:#b3a590; --linea:#3a3026;
+  --acento:#d6434b; --acento2:#e25a61; --oro:#d9b25a; --barra:#4a3f33; color-scheme: dark;
+}
+*{box-sizing:border-box}
+html,body{margin:0;background:var(--papel);color:var(--tinta);font:16px/1.5 system-ui,-apple-system,"Helvetica Neue",Arial,sans-serif;-webkit-font-smoothing:antialiased}
+body{min-height:100vh;padding:0 16px 56px}
+.wrap{max-width:960px;margin:0 auto}
+h2,h3{margin:0}
+.kicker{margin:0 0 6px;font:700 11px/1.2 system-ui;letter-spacing:.14em;text-transform:uppercase;color:var(--tinta2)}
+.muted{color:var(--tinta2);font-size:14px;margin:4px 0 0}
+
+/* ---------- cabecera ---------- */
+header{display:flex;align-items:center;justify-content:space-between;gap:16px;padding:26px 0 18px;border-bottom:1px solid var(--linea);flex-wrap:wrap}
+header img{height:48px;width:auto;display:block}
+:root:not([data-theme="light"]) header img{filter:none}
+@media (prefers-color-scheme: dark){ :root:not([data-theme="light"]) header img{filter:invert(1)} }
+:root[data-theme="dark"] header img{filter:invert(1)}
+.cab-der{display:flex;align-items:center;gap:12px}
+.sub{margin:0;color:var(--tinta2);font:600 12px system-ui;letter-spacing:.12em;text-transform:uppercase}
+.tema{border:1px solid var(--linea);background:var(--papel2);color:var(--tinta);border-radius:999px;padding:7px 12px;font:600 12px system-ui;cursor:pointer}
+
+/* ---------- pestañas ---------- */
+nav.tabs{display:flex;gap:6px;overflow-x:auto;padding:16px 0 4px;scrollbar-width:none}
+nav.tabs::-webkit-scrollbar{display:none}
+.tab{flex:0 0 auto;border:1px solid var(--linea);background:var(--papel2);color:var(--tinta);border-radius:999px;padding:9px 16px;font:600 14px system-ui;cursor:pointer;transition:background .15s,color .15s}
+.tab[aria-selected="true"]{background:var(--acento);color:#fff;border-color:var(--acento)}
+
+.panel{display:none;margin-top:18px}
+.panel.on{display:block}
+.card{background:var(--papel2);border:1px solid var(--linea);border-radius:var(--radio);padding:20px;margin-top:16px}
+.panel > .card:first-child{margin-top:0}
+.grid2{display:grid;gap:16px;grid-template-columns:1fr;margin-top:16px}
+@media (min-width:760px){.grid2{grid-template-columns:1fr 1fr}}
+
+/* ---------- resumen ---------- */
+.hero{display:grid;gap:18px;grid-template-columns:1fr;align-items:center;background:linear-gradient(135deg,var(--papel2),var(--papel))}
+@media (min-width:700px){.hero{grid-template-columns:1fr 1fr}}
+.hero h2{font:700 26px/1.15 system-ui;letter-spacing:-.01em}
+.linea-esferas{display:flex;gap:8px;flex-wrap:wrap;margin-top:8px}
+.tiles{display:grid;gap:12px;grid-template-columns:repeat(2,1fr);margin-top:16px}
+@media (min-width:760px){.tiles{grid-template-columns:repeat(4,1fr)}}
+.tile{background:var(--papel2);border:1px solid var(--linea);border-radius:var(--radio);padding:16px}
+.tile .tv{margin:4px 0 2px;font:700 24px/1.1 system-ui;font-variant-numeric:tabular-nums}
+
+/* ---------- selector de vista ---------- */
+.cabecera-card{display:flex;justify-content:space-between;align-items:center;gap:12px;flex-wrap:wrap;margin-bottom:6px}
+.seg{display:inline-flex;border:1px solid var(--linea);border-radius:999px;overflow:hidden;background:var(--papel)}
+.seg button{border:0;background:transparent;color:var(--tinta);padding:8px 14px;font:600 13px system-ui;cursor:pointer}
+.seg button[aria-pressed="true"]{background:var(--acento);color:#fff}
+.btn{border:0;background:var(--acento);color:#fff;border-radius:999px;padding:11px 18px;font:700 14px system-ui;cursor:pointer}
+.btn.sec{background:transparent;color:var(--tinta);border:1px solid var(--linea)}
+.acciones{display:flex;gap:8px;flex-wrap:wrap;margin-top:14px}
+.pie{margin:12px 0 0;font-size:12px;color:var(--tinta2)}
+
+/* ---------- esferas (estilo bola de sorteo) ---------- */
+.esfera{
+  width:60px;height:60px;border-radius:50%;display:inline-grid;place-items:center;flex:0 0 auto;
+  background:radial-gradient(circle at 34% 30%,#ffffff 0 28%,#f5f3ee 58%,#d9d4c7 100%);
+  color:#2a2a2a;font:700 24px/1 Georgia,"Times New Roman",serif;font-variant-numeric:tabular-nums;
+  box-shadow:inset -6px -8px 14px rgba(90,70,30,.18),0 8px 14px -8px rgba(90,70,30,.55);
+}
+.esfera.s{width:42px;height:42px;font-size:17px}
+.esfera.comp{background:radial-gradient(circle at 34% 30%,#fff8e0 0 28%,#f3e7c2 60%,#d9c48d 100%);color:#6b4f12}
+.esfera.estrella{background:radial-gradient(circle at 34% 30%,#fff6d6 0 28%,#f3d77a 60%,#c99a2e 100%);color:#5a3f0c}
+.vista-bolas{display:flex;flex-wrap:wrap;gap:14px 12px;justify-content:center;padding:22px 8px 8px}
+.vista-bolas .sep{width:100%;text-align:center;font:600 11px system-ui;letter-spacing:.12em;text-transform:uppercase;color:var(--tinta2);margin-top:6px}
+
+/* ---------- boleto de cuadrícula ---------- */
+.boleto{
+  position:relative;margin-top:14px;background:#fbf8ef;color:#3a2b22;
+  border-radius:10px;padding:0 0 14px;overflow:hidden;
+  box-shadow:0 1px 0 rgba(0,0,0,.05),0 10px 26px -14px rgba(60,40,20,.45);
+  font-family:Georgia,"Times New Roman",serif;
+}
+.boleto::before,.boleto::after{
+  content:"";position:absolute;top:0;bottom:0;width:12px;
+  background:radial-gradient(circle at 6px 50%, var(--papel2) 4.5px, transparent 5px) 0 0/12px 16px repeat-y;
+}
+.boleto::before{left:-6px} .boleto::after{right:-6px}
+.bol-cab{display:flex;align-items:center;justify-content:space-between;gap:10px;padding:14px 22px;background:#9b1c23;color:#fff6ea;font:700 12px/1 system-ui;letter-spacing:.16em;text-transform:uppercase;flex-wrap:wrap}
+.bol-cab .juego{font:700 15px/1 system-ui;letter-spacing:.12em}
+.bol-cab .ser{opacity:.85;font-variant-numeric:tabular-nums;letter-spacing:.14em}
+.bol-cuerpo{padding:18px 22px 6px}
+.bol-leyenda{display:flex;justify-content:space-between;gap:8px;font:600 11px system-ui;letter-spacing:.12em;text-transform:uppercase;color:#7a6d5e;margin-bottom:10px;flex-wrap:wrap}
+.bol-leyenda i{display:inline-block;width:12px;height:12px;border-radius:50%;border:1.5px solid #c8323a;vertical-align:-2px;margin-right:6px}
+.bol-leyenda i.on{background:#c8323a}
+.cuadricula{display:grid;gap:6px;max-width:470px;margin:0 auto}
+.celda-b{
+  aspect-ratio:1/1;display:grid;place-items:center;border:1px solid #e0a09b;border-radius:50%;
+  font:600 13px/1 system-ui;font-variant-numeric:tabular-nums;color:#a33a40;background:#fffdf7;
+}
+.celda-b.marca{background:#c8323a;border-color:#c8323a;color:#fff;font-weight:700;box-shadow:inset 0 0 0 2px rgba(255,255,255,.2)}
+.celda-b.comp{border:2px solid #b8912f;color:#7a5c12;font-weight:700}
+.celda-b.marca.comp{background:#b8912f;border-color:#b8912f;color:#fff}
+.bloque{margin-top:18px}
+.reint{display:flex;gap:10px;flex-wrap:wrap;align-items:center;justify-content:center}
+.caja{min-width:44px;height:44px;border:1.5px solid #c8323a;color:#9b1c23;display:grid;place-items:center;font:700 20px/1 Georgia,serif;font-variant-numeric:tabular-nums;padding:0 8px}
+.lbl{font:600 11px system-ui;letter-spacing:.08em;text-transform:uppercase;color:#7a6d5e;margin-right:4px}
+.bol-pie{margin-top:16px;padding:12px 22px 0;border-top:1px dashed #c9b99a;display:flex;justify-content:space-between;gap:8px;font:600 10px/1.4 system-ui;letter-spacing:.1em;text-transform:uppercase;color:#7a6d5e;flex-wrap:wrap}
+.fila-m{display:flex;gap:12px;align-items:center;margin-top:10px}
+.fila-m .pos{flex:0 0 74px;font:700 11px system-ui;letter-spacing:.06em;text-transform:uppercase;color:#9b1c23;text-align:right}
+.fila-m .cuadricula{flex:1;margin:0;max-width:none}
+
+/* ---------- décimo de Navidad (simulación) ---------- */
+.decimo{margin-top:14px;padding:10px;border-radius:14px;background:linear-gradient(180deg,#efe6cf,#e4d6b3)}
+.dec{
+  display:grid;grid-template-columns:minmax(0,.82fr) minmax(0,1.9fr) minmax(0,.62fr);gap:14px;
+  background:linear-gradient(90deg,#fffdf6 0%,#fbf6e6 100%);border-radius:10px;padding:16px;
+  border:1px solid #d7c48d;color:#262626;position:relative;overflow:hidden;
+  font-family:system-ui,-apple-system,"Helvetica Neue",Arial,sans-serif;
+}
+.dec::before{content:"";position:absolute;inset:6px;border:1px dashed #d9c48a;border-radius:6px;pointer-events:none}
+.dec-foto{margin:0;border-radius:4px;overflow:hidden;align-self:stretch;display:flex}
+.dec-foto img{width:100%;height:100%;object-fit:cover;display:block;max-height:420px}
+.dec-centro{display:flex;flex-direction:column;align-items:center;text-align:center;padding:4px 6px;position:relative}
+.dec-top{width:100%;display:flex;justify-content:space-between;font:700 10px system-ui;letter-spacing:.14em;text-transform:uppercase;color:#7b6a3e}
+.dec-aros{display:flex;justify-content:center;gap:12px;margin:14px 0 6px;flex-wrap:wrap}
+.aro{
+  width:64px;height:64px;border-radius:50%;display:grid;place-items:center;
+  background:radial-gradient(circle at 50% 40%,#ffffff 0 52%,#fbf7ea 100%);
+  border:6px solid #d9a72b;box-shadow:inset 0 0 0 2px #f4dc8e,0 2px 4px rgba(120,90,20,.25);
+  font:800 27px/1 system-ui,Arial,sans-serif;color:#1d1d1d;font-variant-numeric:tabular-nums;
+}
+.dec-titulo{margin:14px 0 0;font:900 clamp(20px,3.2vw,30px)/1 system-ui,Arial,sans-serif;text-transform:uppercase;letter-spacing:.01em;color:#c39a2a}
+.dec-titulo span{display:block}
+.dec-fecha{margin:10px 0 0;font:700 clamp(15px,2.2vw,19px) system-ui,Arial,sans-serif;color:#1d1d1d}
+.dec-barras{width:76%;height:44px;margin-top:14px;background:repeating-linear-gradient(90deg,#2a2a2a 0 2px,transparent 2px 5px,#2a2a2a 5px 9px,transparent 9px 11px,#2a2a2a 11px 12px,transparent 12px 15px,#2a2a2a 15px 19px,transparent 19px 21px)}
+.dec-codigo{margin-top:8px;font:600 12px ui-monospace,Menlo,monospace;letter-spacing:.18em;color:#333}
+.dec-ornato{margin-top:10px;color:#c39a2a;font:700 16px/1 system-ui;letter-spacing:.4em}
+.dec-lat{display:flex;flex-direction:column;gap:10px;justify-content:center}
+.caja-l{border:2px solid #d7bd73;border-radius:12px;padding:10px 8px;text-align:center;background:#fffdf5;font:700 10px system-ui;letter-spacing:.12em;text-transform:uppercase;color:#7b6a3e}
+.caja-l b{display:block;margin-top:4px;font:800 18px/1.1 system-ui,Arial,sans-serif;letter-spacing:0;color:#1d1d1d;text-transform:none;font-variant-numeric:tabular-nums}
+.caja-l.precio b{font:900 36px/1 system-ui,Arial,sans-serif}
+.caja-l.precio em{display:block;font:800 12px system-ui;font-style:normal;letter-spacing:.2em;color:#1d1d1d;margin-top:2px}
+.dec-aviso{margin:14px 0 0;font:600 10px system-ui;letter-spacing:.14em;text-transform:uppercase;color:#7b6a3e}
+@media (max-width:700px){
+  .dec{grid-template-columns:1fr}
+  .dec-foto{max-width:200px;margin:0 auto}
+  .dec-lat{flex-direction:row;flex-wrap:wrap}
+  .dec-lat .caja-l{flex:1 1 130px}
+}
+
+/* ---------- gráfico ---------- */
+.grafico svg{width:100%;height:auto;display:block}
+.grafico .barra-n{fill:var(--barra)}
+.grafico .barra-top{fill:var(--acento)}
+.grafico .eje{fill:var(--tinta2);font:600 11px system-ui}
+
+/* ---------- probabilidades ---------- */
+.rejilla{display:grid;grid-template-columns:repeat(auto-fill,minmax(72px,1fr));gap:14px 10px;margin-top:12px}
+.celda-p{text-align:center}
+.celda-p .esfera{width:52px;height:52px;font-size:19px;background:var(--papel2);color:var(--tinta);box-shadow:inset 0 0 0 1px var(--linea);}
+.celda-p .esfera.marcada{background:var(--acento);color:#fff;box-shadow:0 6px 14px -6px var(--acento)}
+.celda-p .pct{display:block;margin-top:6px;font:600 12px system-ui;color:var(--tinta2);font-variant-numeric:tabular-nums}
+
+/* ---------- tablas ---------- */
+h3{font:700 15px system-ui;margin:0 0 12px;letter-spacing:-.005em}
+table{width:100%;border-collapse:collapse;font-size:14px}
+th,td{text-align:left;padding:9px 6px;border-bottom:1px solid var(--linea);font-variant-numeric:tabular-nums}
+th{color:var(--tinta2);font-weight:600;font-size:11px;text-transform:uppercase;letter-spacing:.08em}
+td.num{font-weight:700}
+.bolitas{display:flex;gap:4px;flex-wrap:wrap}
+.bolitas span{display:inline-grid;place-items:center;width:26px;height:26px;border-radius:50%;background:var(--papel2);box-shadow:inset 0 0 0 1px var(--linea);font:700 12px system-ui;font-variant-numeric:tabular-nums}
+.bolitas span.c{box-shadow:inset 0 0 0 2px var(--oro)}
+.bolitas span.e{background:#f3d77a;box-shadow:none}
+.barra-mini{height:6px;background:var(--linea);border-radius:99px;overflow:hidden;min-width:70px}
+.barra-mini span{display:block;height:100%;background:var(--acento)}
+.disc{margin:18px 2px 0;font-size:13px;color:var(--tinta2)}
+input[type="search"]{width:100%;padding:10px 12px;border-radius:10px;border:1px solid var(--linea);background:var(--papel);color:var(--tinta);font:15px system-ui;margin:4px 0 10px}
+.scroll{max-height:380px;overflow:auto}
+
+footer{margin-top:36px;padding-top:18px;border-top:1px solid var(--linea);font-size:12px;color:var(--tinta2)}
+footer p{margin:0 0 8px}
+
+/* ===== 3D: bolas y botones ===== */
+.esfera{
+  width:60px;height:60px;border-radius:50%;position:relative;overflow:hidden;
+  display:inline-grid;place-items:center;flex:0 0 auto;
+  background:
+    radial-gradient(ellipse 34% 22% at 34% 22%, rgba(255,255,255,.95) 0%, rgba(255,255,255,0) 100%),
+    radial-gradient(circle at 36% 30%, #ffffff 0%, #f6f1e4 45%, #d9d0b8 85%, #b9ae92 100%);
+  color:#1f1d1a;font:800 24px/1 Georgia,"Times New Roman",serif;font-variant-numeric:tabular-nums;
+  text-shadow:0 1px 0 rgba(255,255,255,.8);
+  box-shadow:
+    inset -8px -10px 16px rgba(60,45,20,.30),
+    inset 5px 6px 9px rgba(255,255,255,.75),
+    0 14px 20px -10px rgba(50,35,15,.65),
+    0 3px 0 rgba(0,0,0,.05);
+  transition:transform .25s cubic-bezier(.2,.8,.2,1), box-shadow .25s ease;
+  animation:flotar 6s ease-in-out infinite;
+}
+.esfera:nth-child(2n){animation-delay:-1.5s}
+.esfera:nth-child(3n){animation-delay:-3s}
+.esfera:hover{transform:translateY(-4px) scale(1.04)}
+.esfera.s{width:42px;height:42px;font-size:17px}
+.esfera.comp{
+  background:
+    radial-gradient(ellipse 34% 22% at 34% 22%, rgba(255,255,255,.9) 0%, rgba(255,255,255,0) 100%),
+    radial-gradient(circle at 36% 30%, #fff9e6 0%, #f3dc92 45%, #cda23a 85%, #a07d22 100%);
+  color:#4a3508;
+}
+.esfera.estrella{
+  background:
+    radial-gradient(ellipse 34% 22% at 34% 22%, rgba(255,255,255,.9) 0%, rgba(255,255,255,0) 100%),
+    radial-gradient(circle at 36% 30%, #fff6d6 0%, #f3d77a 45%, #c99a2e 85%, #946d17 100%);
+  color:#4a3508;
+}
+@keyframes flotar{0%,100%{transform:translateY(0)}50%{transform:translateY(-3px)}}
+
+/* botones principales */
+.btn{
+  position:relative;overflow:hidden;border:0;border-radius:999px;padding:12px 22px;cursor:pointer;
+  color:#fff;font:700 14px system-ui,-apple-system,Arial,sans-serif;letter-spacing:.01em;
+  background:linear-gradient(180deg,#d13d45 0%,#9b1c23 100%);
+  box-shadow:0 5px 0 #6a1217,0 12px 18px -10px rgba(155,28,35,.7),inset 0 1px 0 rgba(255,255,255,.35);
+  transform:translateY(0);
+  transition:transform .12s ease,box-shadow .12s ease,filter .2s ease;
+}
+.btn::after{
+  content:"";position:absolute;top:0;left:-70%;width:45%;height:100%;
+  background:linear-gradient(100deg,rgba(255,255,255,0),rgba(255,255,255,.45),rgba(255,255,255,0));
+  transform:skewX(-18deg);animation:brillo 5s ease-in-out infinite;pointer-events:none;
+}
+@keyframes brillo{0%,55%{left:-70%}100%{left:140%}}
+.btn:hover{transform:translateY(-2px);filter:brightness(1.05);box-shadow:0 7px 0 #6a1217,0 18px 26px -12px rgba(155,28,35,.8),inset 0 1px 0 rgba(255,255,255,.35)}
+.btn:active{transform:translateY(4px);box-shadow:0 1px 0 #6a1217,0 4px 8px -4px rgba(155,28,35,.6),inset 0 1px 0 rgba(255,255,255,.35)}
+.btn.sec{
+  color:var(--tinta);
+  background:linear-gradient(180deg,var(--papel2),var(--linea));
+  box-shadow:0 5px 0 #b9ad8f,0 10px 16px -10px rgba(60,45,20,.5),inset 0 1px 0 rgba(255,255,255,.8);
+}
+.btn.sec::after{background:linear-gradient(100deg,rgba(255,255,255,0),rgba(255,255,255,.6),rgba(255,255,255,0))}
+.btn.sec:hover{box-shadow:0 7px 0 #b9ad8f,0 18px 24px -12px rgba(60,45,20,.6),inset 0 1px 0 rgba(255,255,255,.8)}
+.btn.sec:active{box-shadow:0 1px 0 #b9ad8f,0 3px 6px -3px rgba(60,45,20,.5),inset 0 1px 0 rgba(255,255,255,.8)}
+
+/* pestañas y tema */
+.tab{
+  box-shadow:0 3px 0 var(--linea),0 6px 10px -6px rgba(60,45,20,.4);
+  transition:transform .12s ease,box-shadow .12s ease,background .15s,color .15s;
+}
+.tab:hover{transform:translateY(-1px)}
+.tab:active{transform:translateY(2px);box-shadow:0 1px 0 var(--linea)}
+.tab[aria-selected="true"]{box-shadow:0 3px 0 #6a1217,0 8px 14px -8px rgba(155,28,35,.8)}
+.tema{
+  box-shadow:0 3px 0 var(--linea),0 6px 10px -6px rgba(60,45,20,.4);
+  transition:transform .12s ease,box-shadow .12s ease;
+}
+.tema:hover{transform:translateY(-1px)}
+.tema:active{transform:translateY(2px);box-shadow:0 1px 0 var(--linea)}
+
+@media (prefers-reduced-motion: reduce){
+  .esfera{animation:none}
+  .btn::after{animation:none;display:none}
+  *{transition-duration:.01ms !important}
+}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header>
+    <img src="logo_jazr.png" alt="JAZR">
+    <div class="cab-der">
+      <p class="sub">Estadísticas de sorteos</p>
+      <button class="tema" id="tema" type="button" aria-label="Cambiar tema">Tema: auto</button>
+    </div>
+  </header>
+
+  <nav class="tabs" role="tablist" id="tabs"></nav>
+
+  <main id="paneles"></main>
+
+  <footer>
+    <p><strong>Fuentes:</strong> Lotoideas (Primitiva, Bonoloto, Euromillones, El Gordo), laguinda.app, elgordo.net y The Objective (Gordo de Navidad, 1812–2025). Comprueba siempre el resultado oficial en loteriasyapuestas.es.</p>
+    <p><strong>Importante:</strong> cada sorteo es independiente. Los porcentajes muestran lo que ha pasado en el histórico y no predicen el siguiente resultado. Ninguna combinación tiene más probabilidad de salir que otra.</p>
+    <p>Los boletos y décimos de esta página son simulaciones. No son documentos oficiales ni sirven para jugar.</p>
+  </footer>
+</div>
+
+<script>
+const DATOS = /*__DATOS__*/null;
+
+/* ---------- utilidades ---------- */
+const $ = (sel, root=document) => root.querySelector(sel);
+const pad = (n, c) => String(n).padStart(c, '0');
+const pct = (x) => (x*100).toFixed(1).replace('.', ',') + ' %';
+const fechaES = (iso) => { const [y,m,d] = iso.split('-'); return `${d}/${m}/${y}`; };
+const aleatorio = (min, max) => min + Math.floor(Math.random() * (max - min + 1));
+const serie = () => String(aleatorio(100000, 999999));
+const nf = (n) => Number(n).toLocaleString('es-ES');
+const ordenar = (arr) => arr.slice().sort((a,b)=>a-b);
+const anioSorteo = (() => { const h = new Date(); return (h.getMonth()===11 && h.getDate()>22) ? h.getFullYear()+1 : h.getFullYear(); })();
+
+function elegirSinRepetir(pool, k){
+  const copia = pool.slice(), res = [];
+  while (res.length < k && copia.length) res.push(copia.splice(Math.floor(Math.random()*copia.length),1)[0]);
+  return res;
+}
+function elegirPonderado(pesos, k){
+  const res = []; let pool = pesos.map(p => ({...p}));
+  while (res.length < k && pool.length){
+    const total = pool.reduce((s,p)=>s+p.peso,0);
+    let r = Math.random()*total, idx = 0;
+    for (; idx<pool.length; idx++){ r -= pool[idx].peso; if (r<=0) break; }
+    idx = Math.min(idx, pool.length-1);
+    res.push(pool[idx].valor); pool.splice(idx,1);
+  }
+  return res;
+}
+
+/* ---------- tema claro / oscuro / automático ---------- */
+const MODOS = ['auto','claro','oscuro'];
+function aplicarTema(m){
+  if (m === 'auto') document.documentElement.removeAttribute('data-theme');
+  else document.documentElement.dataset.theme = m === 'claro' ? 'light' : 'dark';
+  $('#tema').textContent = 'Tema: ' + m;
+}
+function iniciarTema(){
+  let m = 'auto';
+  try { m = localStorage.getItem('jazr-tema') || 'auto'; } catch(e){}
+  aplicarTema(m);
+  $('#tema').addEventListener('click', ()=>{
+    const actual = $('#tema').textContent.replace('Tema: ','');
+    const sig = MODOS[(MODOS.indexOf(actual)+1) % MODOS.length];
+    aplicarTema(sig);
+    try { localStorage.setItem('jazr-tema', sig); } catch(e){}
+  });
+}
+
+/* ---------- configuración ---------- */
+const SORTEOS = [
+  { id:'primitiva', nombre:'La Primitiva', min:1, max:49, cols:7, cant:6, extra:'complementario', filas: DATOS.sorteos.primitiva },
+  { id:'bonoloto', nombre:'Bonoloto', min:1, max:49, cols:7, cant:6, extra:'complementario', filas: DATOS.sorteos.bonoloto },
+  { id:'euromillones', nombre:'Euromillones', min:1, max:50, cols:10, cant:5, extra:'estrellas', estrellas:{min:1,max:12,cols:6,cant:2}, filas: DATOS.sorteos.euromillones },
+  { id:'elgordo', nombre:'El Gordo de la Primitiva', min:0, max:54, cols:11, cant:5, extra:'clave', claveMax:9, filas: DATOS.sorteos.elgordo },
+];
+
+/* ---------- estadísticas ---------- */
+function estadisticas(cfg){
+  const { filas } = cfg, T = filas.length;
+  const cont = {}, ultimo = {};
+  for (let v=cfg.min; v<=cfg.max; v++){ cont[v]=0; ultimo[v]=null; }
+  filas.forEach((fila, idx) => fila.n.forEach(v => {
+    if (cont[v] === undefined) return;
+    cont[v]++;
+    if (ultimo[v] === null) ultimo[v] = idx;
+  }));
+  const lista = [];
+  for (let v=cfg.min; v<=cfg.max; v++)
+    lista.push({ valor:v, veces:cont[v], pct: T ? cont[v]/T : 0, atrasado: ultimo[v] === null ? T : ultimo[v] });
+  return { T, lista };
+}
+
+/* ---------- interfaz común ---------- */
+function mostrar(id){
+  document.querySelectorAll('.tab').forEach(b => b.setAttribute('aria-selected', b.dataset.id===id ? 'true':'false'));
+  document.querySelectorAll('.panel').forEach(p => p.classList.toggle('on', p.id === 'p-'+id));
+}
+function crearTabs(lista){
+  const tabs = $('#tabs');
+  lista.forEach((t, i) => {
+    const b = document.createElement('button');
+    b.className = 'tab'; b.role = 'tab'; b.dataset.id = t.id; b.textContent = t.nombre;
+    b.setAttribute('aria-selected', i===0 ? 'true':'false');
+    b.addEventListener('click', () => mostrar(t.id));
+    tabs.appendChild(b);
+  });
+}
+const tile = (k, v, s) => `<div class="tile"><p class="kicker">${k}</p><p class="tv">${v}</p><p class="muted">${s}</p></div>`;
+
+function graficoSVG(valores, etiquetas, resaltar=[]){
+  const W=720, H=220, P=26;
+  const max = Math.max(...valores) || 1, n = valores.length, bw = (W-2*P)/n;
+  let s = `<svg viewBox="0 0 ${W} ${H}" role="img" aria-label="Frecuencia por número">`;
+  valores.forEach((v,i)=>{
+    const h = (v/max)*(H-2*P), x = P + i*bw + bw*0.16, y = H - P - h;
+    s += `<rect class="${resaltar.includes(i)?'barra-top':'barra-n'}" x="${x.toFixed(1)}" y="${y.toFixed(1)}" width="${(bw*0.68).toFixed(1)}" height="${h.toFixed(1)}" rx="2"><title>${etiquetas[i]}: ${nf(v)}</title></rect>`;
+    if (i % 5 === 0) s += `<text class="eje" x="${(x+bw*0.34).toFixed(1)}" y="${H-7}" text-anchor="middle">${etiquetas[i]}</text>`;
+  });
+  return s + '</svg>';
+}
+
+/* ---------- piezas de boleto ---------- */
+function esferas(nums, clase=''){
+  return nums.map(n => `<span class="esfera ${clase}">${n}</span>`).join('');
+}
+function cuadriculaB(min, max, cols, marcados, comp=null, ancho=2){
+  let h = `<div class="cuadricula" style="grid-template-columns:repeat(${cols},1fr)">`;
+  for (let v=min; v<=max; v++){
+    const m = marcados.includes(v), c = comp === v;
+    h += `<div class="celda-b${m?' marca':''}${c?' comp':''}">${pad(v, ancho)}</div>`;
+  }
+  return h + '</div>';
+}
+function boletoCuadricula(cfg, combo, fecha){
+  let cuerpo = '';
+  if (cfg.extra === 'complementario'){
+    cuerpo = cuadriculaB(cfg.min, cfg.max, cfg.cols, combo.n, combo.c)
+      + `<div class="bloque reint"><span class="lbl">Complementario</span><span class="caja">${pad(combo.c,2)}</span><span class="lbl" style="margin-left:14px">Reintegro</span><span class="caja">${combo.r}</span></div>`;
+  } else if (cfg.extra === 'estrellas'){
+    cuerpo = cuadriculaB(cfg.min, cfg.max, cfg.cols, combo.n)
+      + `<div class="bloque"><div class="lbl" style="text-align:center;margin-bottom:6px">Estrellas</div>${cuadriculaB(cfg.estrellas.min, cfg.estrellas.max, cfg.estrellas.cols, combo.e)}</div>`;
+  } else {
+    cuerpo = cuadriculaB(cfg.min, cfg.max, cfg.cols, combo.n)
+      + `<div class="bloque reint"><span class="lbl">Clave</span><span class="caja">${combo.clave}</span></div>`;
+  }
+  return `<div class="boleto">
+    <div class="bol-cab"><span class="juego">${cfg.nombre}</span><span class="ser">Serie ${combo.serie}</span></div>
+    <div class="bol-cuerpo"><div class="bol-leyenda"><span><i class="on"></i>Elegido</span><span>Simulación · datos hasta ${fecha}</span></div>${cuerpo}</div>
+    <div class="bol-pie"><span>Boleto de simulación · no válido para jugar</span><span>${fecha}</span></div>
+  </div>`;
+}
+function vistaBolas(cfg, combo){
+  let extra = '';
+  if (cfg.extra === 'complementario') extra = `<div class="sep">Complementario y reintegro</div>${esferas([pad(combo.c,2)],'s comp')}${esferas([combo.r],'s')}`;
+  if (cfg.extra === 'estrellas') extra = `<div class="sep">Estrellas</div>${esferas(combo.e.map(e=>pad(e,2)),'s estrella')}`;
+  if (cfg.extra === 'clave') extra = `<div class="sep">Clave</div>${esferas([combo.clave],'s comp')}`;
+  return `<div class="vista-bolas">${esferas(ordenar(combo.n).map(n=>pad(n,2)))}${extra}</div>`;
+}
+function vistaProbabilidades(est, combo, maxPct){
+  return `<p class="muted" style="margin-top:12px">Cada número muestra el porcentaje de sorteos en los que ha salido. El rojo marca tu combinación.</p>
+    <div class="rejilla">${est.lista.map(r=>`<div class="celda-p"><div class="esfera ${combo && combo.n.includes(r.valor)?'marcada':''}">${pad(r.valor,2)}</div><span class="pct">${pct(r.pct)}</span></div>`).join('')}</div>`;
+}
+function ultimoHTML(cfg, u){
+  if (!u) return '<span class="muted">Sin datos</span>';
+  let h = esferas(ordenar(u.n).map(n=>pad(n,2)), 's');
+  if (cfg.extra==='complementario') h += esferas([pad(u.c,2)],'s comp') + esferas([u.r],'s');
+  if (cfg.extra==='estrellas') h += esferas(u.e.map(e=>pad(e,2)),'s estrella');
+  if (cfg.extra==='clave') h += esferas([u.clave],'s comp');
+  return h;
+}
+
+/* ---------- panel de un sorteo ---------- */
+function construirSorteo(cfg){
+  const sec = document.createElement('section');
+  sec.className = 'panel'; sec.id = 'p-'+cfg.id;
+  const est = estadisticas(cfg);
+  const T = est.T, u = cfg.filas[0], fechaUlt = fechaES(u.f), fechaIni = fechaES(cfg.filas[T-1].f);
+  const top = est.lista.slice().sort((a,b)=> b.veces-a.veces || a.valor-b.valor);
+  const over = est.lista.slice().sort((a,b)=> b.atrasado-a.atrasado || a.valor-b.valor);
+  const maxPct = Math.max(...est.lista.map(x=>x.pct));
+  const indicesTop = est.lista.map((r,i)=>({i, v:r.veces})).sort((a,b)=>b.v-a.v).slice(0,5).map(x=>x.i);
+  const ultimos10 = cfg.filas.slice(0,10);
+
+  sec.innerHTML = `
+    <section class="card hero">
+      <div>
+        <p class="kicker">Histórico oficial de terceros</p>
+        <h2>${cfg.nombre}</h2>
+        <p class="muted">${nf(T)} sorteos · del ${fechaIni} al ${fechaUlt}</p>
+      </div>
+      <div>
+        <p class="kicker">Último resultado · ${fechaUlt}</p>
+        <div class="linea-esferas">${ultimoHTML(cfg, u)}</div>
+      </div>
+    </section>
+
+    <div class="tiles">
+      ${tile('Más salido', pad(top[0].valor,2), `${nf(top[0].veces)} veces · ${pct(top[0].pct)}`)}
+      ${tile('Más tiempo sin salir', pad(over[0].valor,2), `${nf(over[0].atrasado)} sorteos seguidos`)}
+      ${tile('Sorteos analizados', nf(T), `desde ${fechaIni}`)}
+      ${tile('Probabilidad teórica', pct(cfg.cant/(cfg.max-cfg.min+1)), `${cfg.cant} de ${cfg.max-cfg.min+1} números`)}
+    </div>
+
+    <section class="card">
+      <div class="cabecera-card">
+        <h3>Generador</h3>
+      </div>
+      <div data-zona></div>
+      <div class="acciones">
+        <button class="btn" data-gen="aleatoria">Generar al azar</button>
+        <button class="btn sec" data-gen="ponderada">Generar por frecuencia</button>
+      </div>
+      <p class="pie">Al azar: todos los números tienen la misma opción. Por frecuencia: se eligen más los que han salido más veces. Ninguna de las dos aumenta tus posibilidades.</p>
+    </section>
+
+    <section class="card">
+      <div class="cabecera-card"><h3>Frecuencia por número</h3><span class="muted">Barras: veces que ha salido cada número</span></div>
+      <div class="grafico">${graficoSVG(est.lista.map(r=>r.veces), est.lista.map(r=>pad(r.valor,2)), indicesTop)}</div>
+      <p class="pie">En rojo, los cinco números que más han salido.</p>
+    </section>
+
+    <div class="grid2">
+      <div class="card">
+        <h3>Los que más han salido</h3>
+        <table><thead><tr><th>Nº</th><th>Veces</th><th>% sorteos</th></tr></thead>
+        <tbody>${top.slice(0,10).map(r=>`<tr><td class="num">${pad(r.valor,2)}</td><td>${nf(r.veces)}</td><td>${pct(r.pct)}</td></tr>`).join('')}</tbody></table>
+      </div>
+      <div class="card">
+        <h3>Los que más llevan sin salir</h3>
+        <table><thead><tr><th>Nº</th><th>Sorteos sin salir</th></tr></thead>
+        <tbody>${over.slice(0,10).map(r=>`<tr><td class="num">${pad(r.valor,2)}</td><td>${nf(r.atrasado)}</td></tr>`).join('')}</tbody></table>
+      </div>
+    </div>
+
+    <div class="grid2">
+      <div class="card">
+        <h3>Últimos 10 sorteos</h3>
+        <table><thead><tr><th>Fecha</th><th>Combinación</th></tr></thead>
+        <tbody>${ultimos10.map(f=>`<tr><td>${fechaES(f.f)}</td><td><div class="bolitas">${ordenar(f.n).map(n=>`<span>${pad(n,2)}</span>`).join('')}${cfg.extra==='complementario'?`<span class="c">${pad(f.c,2)}</span>`:''}</div></td></tr>`).join('')}</tbody></table>
+      </div>
+      <div class="card">
+        <h3>Todos los números</h3>
+        <input type="search" placeholder="Buscar número, por ejemplo 17" data-buscar>
+        <div class="scroll"><table><thead><tr><th>Nº</th><th>Veces</th><th>% sorteos</th><th>Sin salir</th></tr></thead><tbody data-tabla></tbody></table></div>
+      </div>
+    </div>
+    <p class="disc">El % indica en cuántos de los ${nf(T)} sorteos ha salido cada número. Con tanto histórico, las diferencias entre números son pequeñas y se deben sobre todo al azar.</p>`;
+  document.getElementById('paneles').appendChild(sec);
+
+  // tabla completa con buscador
+  const tbody = sec.querySelector('[data-tabla]');
+  const pintarTabla = (f='') => {
+    const q = f.trim();
+    tbody.innerHTML = est.lista.filter(r => !q || pad(r.valor,2).includes(q))
+      .map(r=>`<tr><td class="num">${pad(r.valor,2)}</td><td>${nf(r.veces)}</td><td><div style="display:flex;gap:10px;align-items:center">${pct(r.pct)}<div class="barra-mini" style="flex:1"><span style="width:${(r.pct/maxPct*100).toFixed(1)}%"></span></div></div></td><td>${nf(r.atrasado)}</td></tr>`).join('');
+  };
+  pintarTabla();
+  sec.querySelector('[data-buscar]').addEventListener('input', e => pintarTabla(e.target.value));
+
+  // generador con tres vistas
+  let combo = null, vista = 'bolas';
+  const zona = sec.querySelector('[data-zona]');
+  function pintarZona(){
+    if (!combo){ zona.innerHTML = '<p class="muted" style="text-align:center;padding:24px 0">Pulsa «Generar» para crear una combinación</p>'; return; }
+    zona.innerHTML = vistaBolas(cfg, combo);
+  }
+  function generar(modo){
+    const pool = est.lista.map(r => r.valor);
+    const nums = modo === 'ponderada'
+      ? elegirPonderado(est.lista.map(r=>({valor:r.valor, peso:Math.max(r.veces,1)})), cfg.cant)
+      : elegirSinRepetir(pool, cfg.cant);
+    combo = { n: nums, serie: serie() };
+    if (cfg.extra === 'complementario'){
+      const resto = pool.filter(v=>!nums.includes(v));
+      combo.c = resto[aleatorio(0,resto.length-1)];
+      combo.r = aleatorio(0,9);
+    }
+    if (cfg.extra === 'estrellas'){
+      const pool2 = Array.from({length: cfg.estrellas.max-cfg.estrellas.min+1}, (_,i)=>i+cfg.estrellas.min);
+      combo.e = elegirSinRepetir(pool2, cfg.estrellas.cant).sort((a,b)=>a-b);
+    }
+    if (cfg.extra === 'clave') combo.clave = aleatorio(0, cfg.claveMax);
+    pintarZona();
+  }
+  sec.querySelectorAll('[data-gen]').forEach(b => b.addEventListener('click', ()=>generar(b.dataset.gen)));
+  generar('aleatoria');
+  return sec;
+}
+
+/* ---------- Gordo de Navidad ---------- */
+function construirNavidad(){
+  const datos = DATOS.navidad.slice().sort((a,b)=> b.a - a.a);
+  const T = datos.length;
+  const pos = [0,1,2,3,4].map(() => Array(10).fill(0));
+  const contNumero = {};
+  datos.forEach(d => {
+    const s = pad(d.n, 5);
+    for (let i=0;i<5;i++) pos[i][Number(s[i])]++;
+    contNumero[s] = (contNumero[s]||0)+1;
+  });
+  const totalDig = Array.from({length:10},(_,d)=> pos.reduce((s,col)=>s+col[d],0));
+  const repetidos = Object.entries(contNumero).filter(([,v])=>v>1);
+  const u = datos[0];
+  const ultimas10 = datos.slice(0,10);
+
+  const sec = document.createElement('section');
+  sec.className = 'panel'; sec.id = 'p-navidad';
+  sec.innerHTML = `
+    <section class="card hero">
+      <div>
+        <p class="kicker">Histórico 1812–2025</p>
+        <h2>Gordo de Navidad</h2>
+        <p class="muted">${nf(T)} años · de ${datos[T-1].a} a ${datos[0].a}</p>
+      </div>
+      <div>
+        <p class="kicker">Último Gordo · ${u.a}</p>
+        <div class="linea-esferas">${esferas(pad(u.n,5).split(''),'s')}</div>
+      </div>
+    </section>
+
+    <div class="tiles">
+      ${tile('Años con Gordo', nf(T), 'desde 1812')}
+      ${tile('Números repetidos', nf(repetidos.length), 'han sido Gordo dos veces')}
+      ${tile('Cifra más frecuente', String(totalDig.indexOf(Math.max(...totalDig))), `${nf(Math.max(...totalDig))} apariciones`)}
+      ${tile('Último Gordo', pad(u.n,5), `año ${u.a}`)}
+    </div>
+
+    <section class="card">
+      <div class="cabecera-card">
+        <h3>Generador</h3>
+      </div>
+      <div data-zona></div>
+      <div class="acciones">
+        <button class="btn" data-gen="aleatoria">Generar al azar</button>
+        <button class="btn sec" data-gen="ponderada">Generar por frecuencia</button>
+      </div>
+      <p class="pie">Cada cifra se elige por separado. Por frecuencia usa cuánto ha salido cada dígito en esa posición a lo largo de la historia.</p>
+    </section>
+
+    <section class="card">
+      <div class="cabecera-card"><h3>Frecuencia de cada cifra</h3><span class="muted">Veces que aparece cada dígito en el número</span></div>
+      <div class="grafico">${graficoSVG(totalDig, [0,1,2,3,4,5,6,7,8,9].map(String), [totalDig.indexOf(Math.max(...totalDig))])}</div>
+    </section>
+
+    <div class="grid2">
+      <div class="card">
+        <h3>Números que han sido Gordo más de una vez</h3>
+        ${repetidos.length ? `<table><thead><tr><th>Nº</th><th>Veces</th></tr></thead><tbody>${repetidos.map(([n,v])=>`<tr><td class="num">${n}</td><td>${v}</td></tr>`).join('')}</tbody></table>` : '<p class="muted">Ningún número se ha repetido como Gordo.</p>'}
+      </div>
+      <div class="card">
+        <h3>Últimos 10 Gordos</h3>
+        <table><thead><tr><th>Año</th><th>Número</th></tr></thead>
+        <tbody>${ultimas10.map(d=>`<tr><td>${d.a}</td><td class="num">${pad(d.n,5)}</td></tr>`).join('')}</tbody></table>
+      </div>
+    </div>
+
+    <div class="card" style="margin-top:16px">
+      <h3>Todos los Gordos</h3>
+      <input type="search" placeholder="Buscar año o número" data-buscar>
+      <div class="scroll"><table><thead><tr><th>Año</th><th>Número</th></tr></thead><tbody data-tabla></tbody></table></div>
+    </div>
+    <p class="disc">Solo hay ${nf(T)} sorteos. Con tan pocos datos, las diferencias entre cifras no son significativas. Fuentes: laguinda.app, elgordo.net y The Objective. El año 1969 no está verificado del todo.</p>`;
+  document.getElementById('paneles').appendChild(sec);
+
+  // tabla con buscador
+  const tbody = sec.querySelector('[data-tabla]');
+  const pintarTabla = (f='') => {
+    const q = f.trim();
+    tbody.innerHTML = datos.filter(d => !q || String(d.a).includes(q) || pad(d.n,5).includes(q))
+      .map(d=>`<tr><td>${d.a}</td><td class="num">${pad(d.n,5)}</td></tr>`).join('');
+  };
+  pintarTabla();
+  sec.querySelector('[data-buscar]').addEventListener('input', e => pintarTabla(e.target.value));
+
+  // generador con tres vistas
+  let digitos = null, vista = 'decimo', numero = '', serieNum = '';
+  const zona = sec.querySelector('[data-zona]');
+  function pintarZona(){
+    if (!digitos){ zona.innerHTML = '<p class="muted" style="text-align:center;padding:24px 0">Pulsa «Generar» para crear un número</p>'; return; }
+    {
+      zona.innerHTML = `
+        <div class="decimo"><div class="dec">
+          <figure class="dec-foto"><img src="navidad-salon.jpg" alt="Salón navideño con chimenea y árbol decorado"></figure>
+          <div class="dec-centro">
+            <div class="dec-top"><span>JAZR · simulación</span><span>${anioSorteo}</span></div>
+            <div class="dec-aros">${digitos.map(d=>`<span class="aro">${d}</span>`).join('')}</div>
+            <h3 class="dec-titulo"><span>Lotería de</span><span>Navidad</span></h3>
+            <p class="dec-fecha">22 de diciembre de ${anioSorteo}</p>
+            <div class="dec-barras" aria-hidden="true"></div>
+            <p class="dec-codigo">${numero} · ${serieNum}</p>
+            <p class="dec-ornato" aria-hidden="true">✦ ✦ ✦</p>
+          </div>
+          <div class="dec-lat">
+            <div class="caja-l">Serie<b>${serieNum.slice(0,3)}</b></div>
+            <div class="caja-l">Fracción<b>—</b></div>
+            <div class="caja-l precio">Precio<b>20</b><em>EUROS</em></div>
+          </div>
+        </div>
+        <p class="dec-aviso">Décimo de simulación · no válido para jugar</p>
+        </div>`;
+    }
+  }
+  function generar(modo){
+    digitos = [];
+    for (let i=0;i<5;i++)
+      digitos.push(modo === 'ponderada'
+        ? elegirPonderado(pos[i].map((v,d)=>({valor:d,peso:v+1})),1)[0]
+        : aleatorio(0,9));
+    numero = digitos.join(''); serieNum = serie();
+    pintarZona();
+  }
+  sec.querySelectorAll('[data-gen]').forEach(b => b.addEventListener('click', ()=>generar(b.dataset.gen)));
+  generar('aleatoria');
+  return sec;
+}
+
+/* ---------- arranque ---------- */
+iniciarTema();
+crearTabs([...SORTEOS.map(s=>({id:s.id,nombre:s.nombre})), {id:'navidad', nombre:'Gordo de Navidad'}]);
+SORTEOS.forEach(construirSorteo);
+construirNavidad();
+mostrar('primitiva');
+if ('serviceWorker' in navigator && location.protocol.startsWith('http')){
+  navigator.serviceWorker.register('sw.js').catch(()=>{});
+}
+</script>
+</body>
+</html>
