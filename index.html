@@ -237,19 +237,19 @@ footer p{margin:0 0 8px}
 .btn{
   position:relative;overflow:hidden;border:0;border-radius:999px;padding:12px 22px;cursor:pointer;
   color:#fff;font:700 14px system-ui,-apple-system,Arial,sans-serif;letter-spacing:.01em;
-  background:linear-gradient(180deg,#d13d45 0%,#9b1c23 100%);
-  box-shadow:0 5px 0 #6a1217,0 12px 18px -10px rgba(155,28,35,.7),inset 0 1px 0 rgba(255,255,255,.35);
+  background:linear-gradient(180deg,#a9545a 0%,#874046 100%);
+  box-shadow:0 5px 0 #5e2a2e,0 10px 16px -10px rgba(90,40,44,.55),inset 0 1px 0 rgba(255,255,255,.22);
   transform:translateY(0);
   transition:transform .12s ease,box-shadow .12s ease,filter .2s ease;
 }
 .btn::after{
   content:"";position:absolute;top:0;left:-70%;width:45%;height:100%;
-  background:linear-gradient(100deg,rgba(255,255,255,0),rgba(255,255,255,.45),rgba(255,255,255,0));
+  background:linear-gradient(100deg,rgba(255,255,255,0),rgba(255,255,255,.28),rgba(255,255,255,0));
   transform:skewX(-18deg);animation:brillo 5s ease-in-out infinite;pointer-events:none;
 }
 @keyframes brillo{0%,55%{left:-70%}100%{left:140%}}
-.btn:hover{transform:translateY(-2px);filter:brightness(1.05);box-shadow:0 7px 0 #6a1217,0 18px 26px -12px rgba(155,28,35,.8),inset 0 1px 0 rgba(255,255,255,.35)}
-.btn:active{transform:translateY(4px);box-shadow:0 1px 0 #6a1217,0 4px 8px -4px rgba(155,28,35,.6),inset 0 1px 0 rgba(255,255,255,.35)}
+.btn:hover{transform:translateY(-2px);filter:brightness(1.04);box-shadow:0 7px 0 #5e2a2e,0 16px 24px -12px rgba(90,40,44,.6),inset 0 1px 0 rgba(255,255,255,.22)}
+.btn:active{transform:translateY(4px);box-shadow:0 1px 0 #5e2a2e,0 4px 8px -4px rgba(90,40,44,.5),inset 0 1px 0 rgba(255,255,255,.22)}
 .btn.sec{
   color:var(--tinta);
   background:linear-gradient(180deg,var(--papel2),var(--linea));
