@@ -233,6 +233,13 @@ footer p{margin:0 0 8px}
 }
 @keyframes flotar{0%,100%{transform:translateY(0)}50%{transform:translateY(-3px)}}
 
+/* extras de bolas: complementario, reintegro, estrellas o clave */
+.extras{display:flex;justify-content:center;flex-wrap:wrap;gap:22px;width:100%;margin-top:14px;padding-top:14px;border-top:1px dashed var(--linea)}
+.ext{display:flex;flex-direction:column;align-items:center;gap:6px}
+.etq{font:700 10px/1 system-ui,-apple-system,Arial,sans-serif;letter-spacing:.12em;text-transform:uppercase;color:var(--tinta2)}
+.esfera.xs{width:34px;height:34px;font-size:14px}
+.grupo{display:inline-flex;gap:6px}
+
 /* botones principales */
 .btn{
   position:relative;overflow:hidden;border:0;border-radius:999px;padding:12px 22px;cursor:pointer;
@@ -436,10 +443,11 @@ function boletoCuadricula(cfg, combo, fecha){
   </div>`;
 }
 function vistaBolas(cfg, combo){
+  const ext = (etq, html) => `<div class="ext"><span class="etq">${etq}</span>${html}</div>`;
   let extra = '';
-  if (cfg.extra === 'complementario') extra = `<div class="sep">Complementario y reintegro</div>${esferas([pad(combo.c,2)],'s comp')}${esferas([combo.r],'s')}`;
-  if (cfg.extra === 'estrellas') extra = `<div class="sep">Estrellas</div>${esferas(combo.e.map(e=>pad(e,2)),'s estrella')}`;
-  if (cfg.extra === 'clave') extra = `<div class="sep">Clave</div>${esferas([combo.clave],'s comp')}`;
+  if (cfg.extra === 'complementario') extra = `<div class="extras">${ext('Complementario', esferas([pad(combo.c,2)],'xs comp'))}${ext('Reintegro', esferas([combo.r],'xs'))}</div>`;
+  if (cfg.extra === 'estrellas') extra = `<div class="extras">${ext('Estrellas', `<span class="grupo">${esferas(combo.e.map(e=>pad(e,2)),'xs estrella')}</span>`)}</div>`;
+  if (cfg.extra === 'clave') extra = `<div class="extras">${ext('Clave', esferas([combo.clave],'xs comp'))}</div>`;
   return `<div class="vista-bolas">${esferas(ordenar(combo.n).map(n=>pad(n,2)))}${extra}</div>`;
 }
 function vistaProbabilidades(est, combo, maxPct){
