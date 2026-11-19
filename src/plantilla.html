@@ -14,18 +14,18 @@
 <style>
 :root{
   --papel:#f7f2e8; --papel2:#fffdf7; --tinta:#3a2b22; --tinta2:#7a6d5e; --linea:#e6dccb;
-  --acento:#9b1c23; --acento2:#c8323a; --oro:#b8912f; --barra:#d8ccb4; --sombra-sec:#b9ad8f;
+  --acento:#9b1c23; --acento2:#c8323a; --oro:#b8912f; --barra:#d8ccb4; --sombra-sec:#b59a63; --oro1:#fbf2d9; --oro2:#ead39c;
   --radio:16px; color-scheme: light;
 }
 @media (prefers-color-scheme: dark){
   :root:not([data-theme="light"]){
     --papel:#17130f; --papel2:#221c16; --tinta:#f1e9dc; --tinta2:#b3a590; --linea:#3a3026;
-    --acento:#d6434b; --acento2:#e25a61; --oro:#d9b25a; --barra:#4a3f33; --sombra-sec:#0b0806; color-scheme: dark;
+    --acento:#d6434b; --acento2:#e25a61; --oro:#d9b25a; --barra:#4a3f33; --sombra-sec:#0b0806; --oro1:#4a3b22; --oro2:#33281a; color-scheme: dark;
   }
 }
 :root[data-theme="dark"]{
   --papel:#17130f; --papel2:#221c16; --tinta:#f1e9dc; --tinta2:#b3a590; --linea:#3a3026;
-  --acento:#d6434b; --acento2:#e25a61; --oro:#d9b25a; --barra:#4a3f33; --sombra-sec:#0b0806; color-scheme: dark;
+  --acento:#d6434b; --acento2:#e25a61; --oro:#d9b25a; --barra:#4a3f33; --sombra-sec:#0b0806; --oro1:#4a3b22; --oro2:#33281a; color-scheme: dark;
 }
 *{box-sizing:border-box}
 html,body{margin:0;background:var(--papel);color:var(--tinta);font:16px/1.5 system-ui,-apple-system,"Helvetica Neue",Arial,sans-serif;-webkit-font-smoothing:antialiased}
@@ -252,7 +252,7 @@ footer p{margin:0 0 8px}
 .btn:active{transform:translateY(4px);box-shadow:0 1px 0 #5e2a2e,0 4px 8px -4px rgba(90,40,44,.5),inset 0 1px 0 rgba(255,255,255,.22)}
 .btn.sec{
   color:var(--tinta);
-  background:linear-gradient(180deg,var(--papel2),var(--linea));
+  background:linear-gradient(180deg,var(--oro1),var(--oro2));
   box-shadow:0 5px 0 var(--sombra-sec),0 10px 16px -10px rgba(60,45,20,.5),inset 0 1px 0 rgba(255,255,255,.8);
 }
 .btn.sec::after{background:linear-gradient(100deg,rgba(255,255,255,0),rgba(255,255,255,.6),rgba(255,255,255,0))}
