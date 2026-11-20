@@ -231,6 +231,10 @@ body::before{content:"";position:fixed;inset:0;z-index:-1;pointer-events:none;ba
   .dec-ornato{display:block;margin-top:8px;font-size:12px}
 }
 .dec-titulo::after{content:"";display:block;width:56px;height:2px;margin:12px auto 0;background:var(--gold);border-radius:2px}
+/* Vista de la imagen para guardar en iPhone */
+.vista-imagen{position:fixed;inset:0;z-index:10;display:grid;place-items:center;gap:16px;padding:16px;background:var(--paper);overflow:auto;align-content:center;text-align:center}
+.vista-imagen img{max-width:100%;max-height:72vh;height:auto;border-radius:12px;box-shadow:0 12px 24px -12px var(--shadow)}
+.vista-imagen p{margin:0;color:var(--ink-2)}
 /* Movimiento */
 @media (prefers-reduced-motion: reduce){
   .esfera{animation:none}
@@ -580,6 +584,14 @@ function construirNavidad(){
     numero = digitos.join(''); serieNum = serie();
     pintarZona();
   }
+  // muestra la imagen a pantalla completa: en iPhone se guarda con una pulsación larga
+  function mostrarImagen(url){
+    const capa = document.createElement('div');
+    capa.className = 'vista-imagen';
+    capa.innerHTML = '<img src="' + url + '" alt="Décimo de Navidad"><p>Mantén pulsada la imagen y elige «Guardar imagen».</p><button class="btn sec" type="button">Cerrar</button>';
+    capa.querySelector('button').addEventListener('click', () => capa.remove());
+    document.body.appendChild(capa);
+  }
   // botón para guardar el décimo como imagen PNG
   async function guardarDecimo(ev){
     const btn = ev.currentTarget, dec = sec.querySelector('.dec');
@@ -593,10 +605,18 @@ function construirNavidad(){
           sc.onload = ok; sc.onerror = ko; document.head.appendChild(sc); });
       }
       const lienzo = await window.html2canvas(dec, { scale: 2, backgroundColor: null });
-      const enlace = document.createElement('a');
-      enlace.href = lienzo.toDataURL('image/png');
-      enlace.download = 'decimo-navidad-' + numero + '.png';
-      enlace.click();
+      const url = lienzo.toDataURL('image/png');
+      const nombre = 'decimo-navidad-' + numero + '.png';
+      const archivo = new File([await (await fetch(url)).blob()], nombre, { type: 'image/png' });
+      if (navigator.canShare && navigator.canShare({ files: [archivo] })){
+        try { await navigator.share({ files: [archivo], title: 'Décimo de Navidad' }); }
+        catch (e) { /* el usuario ha cerrado la hoja de compartir */ }
+      } else if (/iPhone|iPad|iPod/.test(navigator.userAgent)){
+        mostrarImagen(url);
+      } else {
+        const enlace = document.createElement('a');
+        enlace.href = url; enlace.download = nombre; enlace.click();
+      }
       btn.textContent = textoOriginal;
     }catch(err){
       btn.textContent = 'No se pudo guardar la imagen';
