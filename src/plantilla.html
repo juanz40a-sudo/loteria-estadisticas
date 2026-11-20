@@ -583,6 +583,33 @@ function construirNavidad(){
     numero = digitos.join(''); serieNum = serie();
     pintarZona();
   }
+  // botón para guardar el décimo como imagen PNG
+  async function guardarDecimo(ev){
+    const btn = ev.currentTarget, dec = sec.querySelector('.dec');
+    if (!dec || !digitos) return;
+    const textoOriginal = btn.textContent;
+    btn.disabled = true; btn.textContent = 'Preparando la imagen…';
+    try{
+      if (!window.html2canvas){
+        await new Promise((ok, ko) => { const sc = document.createElement('script');
+          sc.src = 'https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js';
+          sc.onload = ok; sc.onerror = ko; document.head.appendChild(sc); });
+      }
+      const lienzo = await window.html2canvas(dec, { scale: 2, backgroundColor: null });
+      const enlace = document.createElement('a');
+      enlace.href = lienzo.toDataURL('image/png');
+      enlace.download = 'decimo-navidad-' + numero + '.png';
+      enlace.click();
+      btn.textContent = textoOriginal;
+    }catch(err){
+      btn.textContent = 'No se pudo guardar la imagen';
+      setTimeout(() => { btn.textContent = textoOriginal; }, 2500);
+    }finally{
+      btn.disabled = false;
+    }
+  }
+  sec.querySelector('.acciones').insertAdjacentHTML('beforeend', '<button class="btn sec" type="button" data-guardar>Guardar imagen</button>');
+  sec.querySelector('[data-guardar]').addEventListener('click', guardarDecimo);
   sec.querySelectorAll('[data-gen]').forEach(b => b.addEventListener('click', ()=>generar(b.dataset.gen)));
   generar('aleatoria');
   return sec;
