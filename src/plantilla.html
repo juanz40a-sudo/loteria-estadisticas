@@ -683,12 +683,8 @@ const MAPA_TIERRA = "AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
   }
   function dibujar(){
     ctx.clearRect(0, 0, 160, 160);
-    const halo = ctx.createRadialGradient(C, C, R * 0.92, C, C, R * 1.35);
-    halo.addColorStop(0, 'transparent'); halo.addColorStop(0.55, holo); halo.addColorStop(1, 'transparent');
-    ctx.globalAlpha = 0.3; ctx.fillStyle = halo;
-    ctx.beginPath(); ctx.arc(C, C, R * 1.35, 0, Math.PI * 2); ctx.fill();
-    ctx.globalAlpha = 1; ctx.shadowColor = holo; ctx.shadowBlur = 12; ctx.strokeStyle = holo; ctx.lineWidth = 1.4;
-    ctx.beginPath(); ctx.arc(C, C, R, 0, Math.PI * 2); ctx.stroke(); ctx.shadowBlur = 0;
+    ctx.globalAlpha = 1; ctx.strokeStyle = holo; ctx.lineWidth = 1.2;
+    ctx.beginPath(); ctx.arc(C, C, R, 0, Math.PI * 2); ctx.stroke();
     ctx.fillStyle = holo;
     for (const v of mar){
       const [sx, sy, z] = proyectar(v[0], v[1], v[2]);
