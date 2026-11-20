@@ -655,7 +655,7 @@ const MAPA_TIERRA = "AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
   const esTierra = (i, j) => { const b = j * W + i; return (bits[b >> 3] >> (7 - (b & 7))) & 1; };
   const aVec = (lat, lon) => {
     const la = lat * Math.PI / 180, lo = lon * Math.PI / 180;
-    return [Math.cos(la) * Math.cos(lo), Math.sin(la), Math.cos(la) * Math.sin(lo)];
+    return [Math.cos(la) * Math.sin(lo), Math.sin(la), Math.cos(la) * Math.cos(lo)];
   };
   const tierra = [], mar = [];
   for (let j = 0; j < H; j += 2){
