@@ -21,7 +21,7 @@
   --line:#dfd3b8; --accent:#6f1b25; --accent-2:#55131b; --accent-ink:#fbf4e4;
   --gold:#b08a2c; --gold-2:#e4c46c; --gold-ink:#4f3c10; --shadow:#4a3618;
   --cream:#fbf3dc; --cream-2:#efe0b8; --focus:#1f4f86;
-  --gloss:rgba(255,250,236,.92); --gloss-2:rgba(255,250,236,.6); --shade:rgba(60,45,20,.28);
+  --gloss:rgba(255,250,236,.92); --gloss-2:rgba(255,250,236,.6); --shade:rgba(60,45,20,.28); --label:#fffcf3;
   --radius:12px;
   color-scheme: light;
 }
@@ -30,14 +30,14 @@
     --paper:#14100c; --paper-2:#1d1812; --paper-3:#282016; --ink:#eee5d2; --ink-2:#b3a488;
     --line:#3a2f22; --accent:#e8707f; --accent-2:#b9505e; --accent-ink:#14100c;
     --gold:#d8b25c; --gold-2:#f0d68a; --gold-ink:#3a2a0c; --shadow:#000;
-    --cream:#2a2217; --cream-2:#352c1e; --focus:#9ac2f2; --gloss:rgba(255,250,236,.22); --gloss-2:rgba(255,250,236,.1); --shade:rgba(0,0,0,.45); color-scheme: dark;
+    --cream:#2a2217; --cream-2:#352c1e; --focus:#9ac2f2; --gloss:rgba(255,250,236,.22); --gloss-2:rgba(255,250,236,.1); --shade:rgba(0,0,0,.45); --label:#f2ead8; color-scheme: dark;
   }
 }
 :root[data-theme="dark"]{
   --paper:#14100c; --paper-2:#1d1812; --paper-3:#282016; --ink:#eee5d2; --ink-2:#b3a488;
   --line:#3a2f22; --accent:#e8707f; --accent-2:#b9505e; --accent-ink:#14100c;
   --gold:#d8b25c; --gold-2:#f0d68a; --gold-ink:#3a2a0c; --shadow:#000;
-  --cream:#2a2217; --cream-2:#352c1e; --focus:#9ac2f2; --gloss:rgba(255,250,236,.22); --gloss-2:rgba(255,250,236,.1); --shade:rgba(0,0,0,.45); color-scheme: dark;
+  --cream:#2a2217; --cream-2:#352c1e; --focus:#9ac2f2; --gloss:rgba(255,250,236,.22); --gloss-2:rgba(255,250,236,.1); --shade:rgba(0,0,0,.45); --label:#f2ead8; color-scheme: dark;
 }
 *{box-sizing:border-box}
 html{background:var(--paper)}
@@ -104,14 +104,14 @@ nav.tabs::-webkit-scrollbar{display:none}
 .pie{margin: 12px 0 0;font-size:13px;color:var(--ink-2)}
 
 /* Esferas */
-.esfera{width:60px;height:60px;border-radius:50%;position:relative;display:inline-grid;place-items:center;flex:0 0 auto;color:var(--ink);font:700 24px/1 Georgia,"Times New Roman",serif;font-variant-numeric:tabular-nums;background:radial-gradient(ellipse 34% 22% at 34% 22%,var(--gloss) 0%,transparent 100%),radial-gradient(circle at 36% 30%,var(--paper-2) 0%,var(--paper-3) 55%,var(--line) 100%);box-shadow:inset -8px -10px 16px var(--shadow),inset 5px 6px 9px var(--gloss-2),0 14px 20px -10px var(--shadow);transition:transform .25s cubic-bezier(.2,.8,.2,1);animation:flotar 6s ease-in-out infinite}
+.esfera{width:60px;height:60px;border-radius:50%;position:relative;display:inline-grid;place-items:center;flex:0 0 auto;color:var(--ink);font:800 24px/1 Georgia,"Times New Roman",serif;font-variant-numeric:tabular-nums;background:radial-gradient(circle closest-side,var(--label) 0 62%,var(--line) 63% 66%,transparent 67%),radial-gradient(ellipse 34% 22% at 34% 22%,var(--gloss) 0%,transparent 100%),radial-gradient(circle at 36% 30%,var(--paper-3) 0%,var(--line) 75%,var(--ink-2) 100%);box-shadow:inset -8px -10px 16px var(--shadow),inset 5px 6px 9px var(--gloss-2),0 14px 20px -10px var(--shadow);transition:transform .25s cubic-bezier(.2,.8,.2,1);animation:flotar 6s ease-in-out infinite}
 .esfera:nth-child(2n){animation-delay:-1.5s}
 .esfera:nth-child(3n){animation-delay:-3s}
 .esfera:hover{transform:translateY(-4px) scale(1.04)}
 .esfera.s{width:44px;height:44px;font-size:18px}
 .esfera.xs{width:34px;height:34px;font-size:14px}
-.esfera.comp{background:radial-gradient(circle at 36% 30%,var(--gold-2) 0%,var(--gold) 85%,var(--gold-ink) 100%);color:var(--gold-ink)}
-.esfera.estrella{background:radial-gradient(circle at 36% 30%,var(--cream) 0%,var(--gold-2) 60%,var(--gold) 100%);color:var(--gold-ink)}
+.esfera.comp{background:radial-gradient(circle closest-side,var(--label) 0 62%,var(--gold-ink) 63% 66%,transparent 67%),radial-gradient(circle at 36% 30%,var(--gold-2) 0%,var(--gold) 85%,var(--gold-ink) 100%);color:var(--ink)}
+.esfera.estrella{background:radial-gradient(circle closest-side,var(--label) 0 62%,var(--gold-ink) 63% 66%,transparent 67%),radial-gradient(circle at 36% 30%,var(--gold-2) 0%,var(--gold) 100%);color:var(--ink)}
 @keyframes flotar{0%,100%{transform:translateY(0)}50%{transform:translateY(-3px)}}
 .vista-bolas{display:flex;flex-wrap:wrap;gap: 16px 12px;justify-content:center;padding:24px 8px 8px}
 .extras{display:flex;justify-content:center;flex-wrap:wrap;gap: 24px;width:100%;margin-top: 16px;padding-top:16px;border-top:1px dashed var(--line)}
